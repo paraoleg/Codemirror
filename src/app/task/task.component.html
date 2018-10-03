@@ -1,0 +1,58 @@
+<h1>Task title</h1>
+
+<div>
+    <div *ngIf="task" class="row">
+        <div class="col-md-8">
+            <app-editor [content]="task.content"></app-editor>
+        </div>
+        <div class="col-md-4" id="chatbox">
+
+            <div id="video-container">
+                <video autoplay id="their-video"></video>
+                <video autoplay id="my-video" muted="true"></video>
+                <div id="step2">
+                    <p>Your Id: <span id="my-id">...</span></p>
+                    <div class="form-inline">
+                        <input type="text" class="form-control" placeholder="Call User Id" id="callto-id">
+                        <a href="#" class="btn btn-sm btn-success" id="make-call">Call</a>
+                    </div>
+                </div>
+                <div id="step3">
+                    <p>Talk to <span id="their-id">.</span>
+                    <a href="#" class="btn btn-sm btn-danger" id="end-call">End call</a>
+                    </p>
+
+                </div>
+            </div>
+
+            <div class="card bg-light mb-3">
+                <div class="card-header">
+                    Chat room
+                    <span *ngIf="data.user" class="pull-right">
+                            {{data.user.name}}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush" style="height: 300px; overflow-y: scroll;" id="chatbox-listMessages">
+                        <li *ngFor="let message of messages" class="media">
+                            <div class="media-body">
+                                {{message.author}}: {{message.text}}
+                                <hr>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <div class="input-group">
+                        <input [(ngModel)]="messageText" (keydown)="keyDownFunction($event)" type="text" class="form-control" placeholder="Text something..">
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-primary" onclick="sendMessage()">Send</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
