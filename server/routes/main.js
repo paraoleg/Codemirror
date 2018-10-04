@@ -20,10 +20,10 @@ router.get('/', checkJWT, (req, res, next) => {
         });
 });
 
-router.get('/newTask', checkJWT, (req, res, next) =>{
+router.get('/newTask', checkJWT, (req, res) =>{
     let newTask = new Task();
     newTask.owner = req.decoded.user._id;
-    newTask.content = '//New task created'
+    newTask.content = '//New task'
     newTask.save()
         .then(data => res.json({
             success: true,
@@ -38,7 +38,7 @@ router.get('/newTask', checkJWT, (req, res, next) =>{
         });
 });
 
-router.get('/task/:id', (req, res, next) => {
+router.get('/task/:id', (req, res) => {
     if(req.params.id){
         Task.findOne({_id: req.params.id})
             .then(data => {
