@@ -1,10 +1,10 @@
 const router = require('express').Router();
 
 const Task = require('../models/task');
-const checkJWT = require('../middlewares/check-jwt');
+const isAuth = require('../middlewares/isAuth');
 
-router.get('/', checkJWT, (req, res, next) => {
-    Task.find({owner: req.decoded.user._id})
+router.get('/', isAuth, (req, res) => {
+    Task.find({owner: req.user._id})
         .then(tasks => {
             res.json({
                 success: true,
@@ -20,9 +20,9 @@ router.get('/', checkJWT, (req, res, next) => {
         });
 });
 
-router.get('/newTask', checkJWT, (req, res) =>{
+router.get('/newTask',  isAuth, (req, res) =>{
     let newTask = new Task();
-    newTask.owner = req.decoded.user._id;
+    newTask.owner = req.user._id;
     newTask.content = '//New task'
     newTask.save()
         .then(data => res.json({
@@ -38,7 +38,7 @@ router.get('/newTask', checkJWT, (req, res) =>{
         });
 });
 
-router.get('/task/:id', (req, res) => {
+router.get('/task/:id', isAuth, (req, res) => {
     if(req.params.id){
         Task.findOne({_id: req.params.id})
             .then(data => {

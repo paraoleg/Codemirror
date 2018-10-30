@@ -1,10 +1,11 @@
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
+const passport = require('passport');
 
 const User = require('../models/user');
 
-const config = require('../config/config')
-const checkJWT = require('../middlewares/check-jwt')
+const config = require('../config/config');
+const isAuth = require('../middlewares/isAuth');
 
 router.post('/signup', (req, res) => {
     let newUser = new User();
@@ -22,6 +23,7 @@ router.post('/signup', (req, res) => {
             } else {
                 newUser.save();
                 var token = jwt.sign({ user: newUser }, config.secret, { expiresIn: '7d' });
+                console.log(token)
                 res.json({
                     success: true,
                     message: 'Enjoy your token',
@@ -38,43 +40,43 @@ router.post('/signup', (req, res) => {
 });
 
 router.post('/login', (req, res) => {
-
-    User.findOne({ email: req.body.email })
-        .then(user => {
-            if(!user){
-                res.json({
-                    success: false,
-                    message: 'Auth failed, user not found'
-                });
-            } else {
-                let isPasswordValid = user.validPassword(req.body.password);
-                if(!isPasswordValid){
-                    res.json({
-                        success: false,
-                        message: 'Auth failed, wrong password'
-                    });
-                } else {
-                    const token = jwt.sign({ user: user }, config.secret, { expiresIn: '7d' });
-                    res.json({
-                        success: true,
-                        message: 'Enjoy your token',
-                        token
-                    }); 
-                }
-            }    
-        })
-        .catch(err => {
-            res.json({
+    passport.authenticate('local', {session: false}, (err, user, info) => {
+        if (err || !user) {
+            return res.json({
                 success: false,
-                message: 'Auth failed, Database error'
+                message: info ? info.message : 'Login failed'
             });
+        }
+
+        req.login(user, {session: false}, err => {
+            if (err) {
+                console.log(err);
+                return res.json({
+                    success: false,
+                    message: 'Login failed'
+                });
+            }
+
+            const token = jwt.sign({ user }, config.secret, { expiresIn: '7d' });
+            res.json({
+                success: true,
+                message: 'Enjoy your token',
+                token
+            }); 
         });
-    
+    })(req, res);
 });
 
 router.route('/profile')
-    .get(checkJWT, (req, res) => {
-        User.findOne({ _id: req.decoded.user._id })
+    .get(isAuth, (req, res) => {
+        console.log(req.user);
+        if (!req.user){
+            res.json({
+                success: false,
+                message: 'Do not found user',
+            });
+        } else {
+            User.findOne({ _id: req.user._id })
             .then(user => {
                 res.json({
                     success: true,
@@ -83,11 +85,14 @@ router.route('/profile')
                 });
             })
             .catch(err => {
+                console.log('Err' + err)
                 res.json({
                     success: false,
                     message: 'Do not found user',
                 });
             });
+        }
+        
     });
 
 module.exports = router;

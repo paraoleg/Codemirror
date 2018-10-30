@@ -3,11 +3,11 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
-//const passport = require('passport');
+const passport = require('passport');
 
 const config = require('./config/config');
 
-//require('./config/passport');
+require('./config/passport');
 
 const app = express();
 
@@ -28,7 +28,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(morgan('dev'));
 app.use(cors());
 
-//app.use(passport.initialize());
+app.use(passport.initialize());
 
 const mainRoute = require('./routes/main');
 const authRoute = require('./routes/auth')
