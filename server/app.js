@@ -11,7 +11,7 @@ require('./config/passport');
 
 const app = express();
 
-mongoose.connect(config.database, { useNewUrlParser: true }, err => {
+mongoose.connect(config.mongoURI, { useNewUrlParser: true }, err => {
     if (err) {
         console.log(err);
     } else {
@@ -36,5 +36,5 @@ app.use('/api', mainRoute);
 app.use('/api/auth', authRoute);
 
 app.listen(config.port, err => {
-    console.log('Server on port 3030')
+    console.log(`Server on port ${config.port}`)
 });

@@ -13,7 +13,7 @@ export class TaskComponent implements OnInit {
   task: Object;
   roomId: String;
   messageText: String;
-  messages: Array<Object> = [];
+  messages: Array<{text: String, author: String, date: String}> = [];
 
   constructor (
     private rest: RestApiService,
@@ -25,7 +25,6 @@ export class TaskComponent implements OnInit {
 
     this.socket.newMessageRecieved()
     .subscribe(data => {
-      console.log(data);
       let newMessage = {
         text: data.text,
         author: data.author,
@@ -45,6 +44,17 @@ export class TaskComponent implements OnInit {
             ? this.task = data['task']
             : this.router.navigate(['/']);
           this.join();
+          
+          if (this.task['messages']) {
+            this.task['messages'].map( message => {
+              let newMessage = {
+                text: message.text,
+                author: message.owner.name,
+                date: message.date
+              };        
+              this.messages.push(newMessage);
+            })
+          }
         })
         .catch (error => console.log(error));
     });
@@ -67,16 +77,11 @@ export class TaskComponent implements OnInit {
     this.socket.sendMessage({
       id: this.task['_id'],
       author: this.data.user.name,
+      owner: this.data.user._id,
       text: this.messageText,
       date: date
     })
-    console.log({
-      'id': this.task['_id'],
-      'author': this.data.user.name,
-      'text': this.messageText,
-      'date': date
-    });
-
+    
     this.messageText = '';
   }
 
@@ -85,7 +90,4 @@ export class TaskComponent implements OnInit {
       this.sendMessage();
     }
   }
-
- 
-
 }

@@ -46,7 +46,7 @@
                     <div class="input-group">
                         <input [(ngModel)]="messageText" (keydown)="keyDownFunction($event)" type="text" class="form-control" placeholder="Text something..">
                         <span class="input-group-btn">
-                            <button type="button" class="btn btn-primary" onclick="sendMessage()">Send</button>
+                            <button type="button" class="btn btn-primary" (click)="sendMessage()">Send</button>
                         </span>
                     </div>
                 </div>
